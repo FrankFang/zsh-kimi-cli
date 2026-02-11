@@ -147,6 +147,9 @@ __kimi_cli_line_pre_redraw() {
 __kimi_cli_line_finish() {
   emulate -L zsh
 
+  # 重置前缀模式状态，使前缀成为一次性使用
+  __KIMI_CLI_PREFIX_ACTIVE=0
+
   if (( __KIMI_CLI_HAS_PREV_LINE_FINISH )); then
     zle __kimi_cli_prev_line_finish
   fi
