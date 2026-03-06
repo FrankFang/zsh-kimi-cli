@@ -201,29 +201,25 @@ __kimi_cli_register_guard_widget() {
 }
 
 if [[ -o interactive ]]; then
-  zle -N __kimi_cli_toggle_prefix
-
-  local -a __kimi_cli_keymaps=("emacs" "viins")
-  local keymap
-  for keymap in "${__kimi_cli_keymaps[@]}"; do
-    bindkey -M "$keymap" '^X' __kimi_cli_toggle_prefix 2>/dev/null
-  done
-  unset keymap __kimi_cli_keymaps
-
   if (( ! __KIMI_CLI_WIDGETS_INSTALLED )); then
-    if zle -A zle-line-init __kimi_cli_prev_line_init 2>/dev/null; then
-      __KIMI_CLI_HAS_PREV_LINE_INIT=1
-    fi
+    zle -N __kimi_cli_toggle_prefix
+
+    local -a __kimi_cli_keymaps=("emacs" "viins")
+    local keymap
+    for keymap in "${__kimi_cli_keymaps[@]}"; do
+      bindkey -M "$keymap" '^X' __kimi_cli_toggle_prefix 2>/dev/null
+    done
+    unset keymap __kimi_cli_keymaps
+
+    zle -N __kimi_cli_prev_line_init zle-line-init 2>/dev/null && __KIMI_CLI_HAS_PREV_LINE_INIT=1
     zle -N zle-line-init __kimi_cli_line_init
 
-    if zle -A zle-line-pre-redraw __kimi_cli_prev_line_pre_redraw 2>/dev/null; then
-      __KIMI_CLI_HAS_PREV_LINE_PRE_REDRAW=1
+    if [[ -n "$widgets[zle-line-pre-redraw]" ]]; then
+      zle -N __kimi_cli_prev_line_pre_redraw zle-line-pre-redraw 2>/dev/null && __KIMI_CLI_HAS_PREV_LINE_PRE_REDRAW=1
+      zle -N zle-line-pre-redraw __kimi_cli_line_pre_redraw
     fi
-    zle -N zle-line-pre-redraw __kimi_cli_line_pre_redraw
 
-    if zle -A zle-line-finish __kimi_cli_prev_line_finish 2>/dev/null; then
-      __KIMI_CLI_HAS_PREV_LINE_FINISH=1
-    fi
+    zle -N __kimi_cli_prev_line_finish zle-line-finish 2>/dev/null && __KIMI_CLI_HAS_PREV_LINE_FINISH=1
     zle -N zle-line-finish __kimi_cli_line_finish
     __kimi_cli_register_guard_widget backward-delete-char
     __kimi_cli_register_guard_widget backward-kill-word
